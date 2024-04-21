@@ -48,7 +48,7 @@ export const getDynamicAllFeaturesFlags = async ({
   callback: (isActivated: boolean) => void
 }) => {
   try {
-    if (!token || !key || !env || !featureFlag) {
+    if (!token || !key || !env || !featureFlag || !callback) {
       throw 'needed paramters'
     }
 
