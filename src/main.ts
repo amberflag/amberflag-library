@@ -48,33 +48,33 @@ export const getDynamicAllFeaturesFlags = async ({
   callback: (isActivated: boolean) => void
 }) => {
   try {
-    try {
-      const { data } = await axios.post(
-        'https://amberflag-server.onrender.com',
-        { key, token }
-      )
-
-      if (!data) {
-        return callback(false)
-      }
-
-      const socket = io('https://amberflag-service.onrender.com')
-      socket.on('connect', () => {
-        socket.on(key, data => {
-          const dataParsed = JSON.parse(data)
-          if (dataParsed.name === featureFlag) {
-            if (dataParsed?.changesEnv?.length) {
-              if (dataParsed?.changesEnv.indexOf(env) !== -1) {
-                return callback(true)
-              }
-            }
-            return callback(false)
-          }
-        })
-      })
-    } catch (error) {
-      return error
+    if (!token || !key || !env || !featureFlag) {
+      throw 'needed paramters'
     }
+
+    const { data } = await axios.post('https://amberflag-server.onrender.com', {
+      key,
+      token
+    })
+
+    if (!data) {
+      return callback(false)
+    }
+
+    const socket = io('https://amberflag-service.onrender.com')
+    socket.on('connect', () => {
+      socket.on(key, data => {
+        const dataParsed = JSON.parse(data)
+        if (dataParsed.name === featureFlag) {
+          if (dataParsed?.changesEnv?.length) {
+            if (dataParsed?.changesEnv.indexOf(env) !== -1) {
+              return callback(true)
+            }
+          }
+          return callback(false)
+        }
+      })
+    })
   } catch (error) {
     return error
   }
